@@ -4,8 +4,8 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import com.prime.preferences.LongTransformer
-import com.prime.preferences.Preference
-import com.prime.preferences.longPreferencesKey
+import com.prime.preferences.Preferences
+import com.prime.preferences.longPreferenceKey
 
 val key = longPreferenceKey("Zak", object : LongTransformer<Test> {
     override fun from(value: Test): Long {
