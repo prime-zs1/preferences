@@ -133,22 +133,22 @@ interface Preferences {
  */
 typealias IntTransformer<O> = TwoWayConverter<O, Int>
 
-fun intPreferencesKey(name: String): Key<Int> =
+fun intPreferenceKey(name: String): Key<Int> =
     androidx.datastore.preferences.core.intPreferencesKey(name)
 
-fun intPreferencesKey(name: String, defaultValue: Int): Key1<Int> =
-    Key1(intPreferencesKey(name), defaultValue)
+fun intPreferenceKey(name: String, defaultValue: Int): Key1<Int> =
+    Key1(intPreferenceKey(name), defaultValue)
 
 
-fun <O> intPreferencesKey(name: String, transformer: IntTransformer<O>) =
-    Key2(intPreferencesKey(name), transformer)
+fun <O> intPreferenceKey(name: String, transformer: IntTransformer<O>) =
+    Key2(intPreferenceKey(name), transformer)
 
-fun <O> intPreferencesKey(
+fun <O> intPreferenceKey(
     name: String,
     defaultValue: O,
     transformer: IntTransformer<O>
 ) = Key3(
-    intPreferencesKey(name),
+    intPreferenceKey(name),
     defaultValue,
     transformer
 )
@@ -160,21 +160,21 @@ fun <O> intPreferencesKey(
  */
 typealias DoubleTransformer<O> = TwoWayConverter<O, Double>
 
-fun doublePreferencesKey(name: String): Key<Double> =
+fun doublePreferenceKey(name: String): Key<Double> =
     androidx.datastore.preferences.core.doublePreferencesKey(name)
 
-fun doublePreferencesKey(name: String, defaultValue: Double): Key1<Double> =
-    Key1(doublePreferencesKey(name), defaultValue)
+fun doublePreferenceKey(name: String, defaultValue: Double): Key1<Double> =
+    Key1(doublePreferenceKey(name), defaultValue)
 
-fun <O> doublePreferencesKey(name: String, transformer: DoubleTransformer<O>) =
-    Key2(doublePreferencesKey(name), transformer)
+fun <O> doublePreferenceKey(name: String, transformer: DoubleTransformer<O>) =
+    Key2(doublePreferenceKey(name), transformer)
 
-fun <O> doublePreferencesKey(
+fun <O> doublePreferenceKey(
     name: String,
     defaultValue: O,
     transformer: DoubleTransformer<O>
 ) = Key3(
-    doublePreferencesKey(name),
+    doublePreferenceKey(name),
     defaultValue,
     transformer
 )
@@ -186,21 +186,21 @@ fun <O> doublePreferencesKey(
  */
 typealias FloatTransformer<O> = TwoWayConverter<O, Float>
 
-fun floatPreferencesKey(name: String): Key<Float> =
+fun floatPreferenceKey(name: String): Key<Float> =
     androidx.datastore.preferences.core.floatPreferencesKey(name)
 
-fun floatPreferencesKey(name: String, defaultValue: Float): Key1<Float> =
-    Key1(floatPreferencesKey(name), defaultValue)
+fun floatPreferenceKey(name: String, defaultValue: Float): Key1<Float> =
+    Key1(floatPreferenceKey(name), defaultValue)
 
-fun <O> floatPreferencesKey(name: String, transformer: FloatTransformer<O>) =
-    Key2(floatPreferencesKey(name), transformer)
+fun <O> floatPreferenceKey(name: String, transformer: FloatTransformer<O>) =
+    Key2(floatPreferenceKey(name), transformer)
 
-fun <O> floatPreferencesKey(
+fun <O> floatPreferenceKey(
     name: String,
     defaultValue: O,
     transformer: FloatTransformer<O>
 ) = Key3(
-    floatPreferencesKey(name),
+    floatPreferenceKey(name),
     defaultValue,
     transformer
 )
@@ -211,21 +211,21 @@ fun <O> floatPreferencesKey(
  */
 typealias LongTransformer<O> = TwoWayConverter<O, Long>
 
-fun longPreferencesKey(name: String): Key<Long> =
+fun longPreferenceKey(name: String): Key<Long> =
     androidx.datastore.preferences.core.longPreferencesKey(name)
 
-fun longPreferencesKey(name: String, defaultValue: Long): Key1<Long> =
-    Key1(longPreferencesKey(name), defaultValue)
+fun longPreferenceKey(name: String, defaultValue: Long): Key1<Long> =
+    Key1(longPreferenceKey(name), defaultValue)
 
-fun <O> longPreferencesKey(name: String, transformer: LongTransformer<O>) =
-    Key2(longPreferencesKey(name), transformer)
+fun <O> longPreferenceKey(name: String, transformer: LongTransformer<O>) =
+    Key2(longPreferenceKey(name), transformer)
 
-fun <O> longPreferencesKey(
+fun <O> longPreferenceKey(
     name: String,
     defaultValue: O,
     transformer: LongTransformer<O>
 ) = Key3(
-    longPreferencesKey(name),
+    longPreferenceKey(name),
     defaultValue,
     transformer
 )
@@ -237,29 +237,29 @@ fun <O> longPreferencesKey(
  */
 typealias StringTransformer<O> = TwoWayConverter<O, String>
 
-fun stringPreferencesKey(name: String): Key<String> =
+fun stringPreferenceKey(name: String): Key<String> =
     androidx.datastore.preferences.core.stringPreferencesKey(name)
 
-fun stringPreferencesKey(name: String, defaultValue: String): Key1<String> =
-    Key1(stringPreferencesKey(name), defaultValue)
+fun stringPreferenceKey(name: String, defaultValue: String): Key1<String> =
+    Key1(stringPreferenceKey(name), defaultValue)
 
-fun <O> stringPreferencesKey(name: String, transformer: StringTransformer<O>) =
-    Key2(stringPreferencesKey(name), transformer)
+fun <O> stringPreferenceKey(name: String, transformer: StringTransformer<O>) =
+    Key2(stringPreferenceKey(name), transformer)
 
-fun <O> stringPreferencesKey(
+fun <O> stringPreferenceKey(
     name: String,
     defaultValue: O,
     transformer: StringTransformer<O>
 ) = Key3(
-    stringPreferencesKey(name),
+    stringPreferenceKey(name),
     defaultValue,
     transformer
 )
 
 
 ///String set
-fun stringSetPreferencesKey(name: String) =
+fun stringSetPreferenceKey(name: String) =
     androidx.datastore.preferences.core.stringSetPreferencesKey(name)
 
-fun stringSetPreferencesKey(name: String, defaultValue: Set<String>): Key1<Set<String>> =
-    Key1(stringSetPreferencesKey(name), defaultValue)
+fun stringSetPreferenceKey(name: String, defaultValue: Set<String>): Key1<Set<String>> =
+    Key1(stringSetPreferenceKey(name), defaultValue)
