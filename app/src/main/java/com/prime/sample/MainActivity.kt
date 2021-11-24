@@ -2,6 +2,7 @@ package com.prime.sample
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import com.prime.preferences.LongTransformer
 import com.prime.preferences.Preferences
 import com.prime.preferences.longPreferencesKey
@@ -27,12 +28,15 @@ val key = longPreferencesKey("Zak", object : LongTransformer<Test> {
     }
 })
 
+private const val TAG = "MainActivity"
+
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         val prefs = Preferences.get(this)
+        Log.i(TAG, "onCreate: ")
     }
 }
 
