@@ -254,6 +254,31 @@ public fun <O> longPreferenceKey(
     mapper
 )
 
+
+
+/**
+ * Maps value to/from [Boolean].
+ */
+typealias BooleanMapper<O> = TwoWayConverter<O, Boolean>
+
+public fun booleanPreferenceKey(name: String): Key<Boolean> = Key(booleanPreferencesKey(name))
+
+public fun booleanPreferenceKey(name: String, defaultValue: Boolean): Key1<Boolean> =
+    Key1(booleanPreferencesKey(name), defaultValue)
+
+public fun <O> booleanPreferenceKey(name: String, mapper: BooleanMapper<O>) =
+    Key2(booleanPreferencesKey(name), mapper)
+
+public fun <O> booleanPreferenceKey(
+    name: String,
+    defaultValue: O,
+    mapper: BooleanMapper<O>
+) = Key3(
+    booleanPreferencesKey(name),
+    defaultValue,
+    mapper
+)
+
 /**
  * Maps value to/from [String].
  */
