@@ -20,6 +20,7 @@ private const val PREFERENCE_NAME = "Shared_Preferences"
 
 
 internal class PreferencesImpl(context: Context) : Preferences {
+
     private val scope = CoroutineScope(
         Dispatchers.Main + SupervisorJob()
     )
@@ -41,17 +42,19 @@ internal class PreferencesImpl(context: Context) : Preferences {
             }
         }
 
-    override fun <T> get(key: Key<T>): Flow<T?> = flow.map { it[key] }
 
-    override fun <T> get(key: Key1<T>): Flow<T> = flow.map { it[key.key] ?: key.defaultValue }
+    override fun <T> get(key: Key<T>): Flow<T?> = flow.map { it[key.original] }
 
-    override fun <S, O> get(key: Key2<S, O>): Flow<O?> =
-        flow.map { it[key.key]?.let { key.converter.to(it) } }
+    override fun <T> get(key: Key1<T>): Flow<T> = flow.map { it[key.original] ?: key.defaultValue }
 
-    override fun <S, O> get(key: Key3<S, O>): Flow<O> =
-        flow.map { it[key.key]?.let { key.converter.to(it) } ?: key.defaultValue }
+    override fun <T, O> get(key: Key2<T, O>): Flow<O?> =
+        flow.map { it[key.original]?.let { key.converter.to(it) } }
 
-    override fun <T> set(key: Key<T>, value: T) {
+    override fun <T, O> get(key: Key3<T, O>): Flow<O> =
+        flow.map { it[key.original]?.let { key.converter.to(it) } ?: key.defaultValue }
+
+
+    private fun <T> set(key: DataStoreKey<T>, value: T) {
         scope.launch {
             store.edit {
                 it[key] = value
@@ -59,25 +62,34 @@ internal class PreferencesImpl(context: Context) : Preferences {
         }
     }
 
-    override fun <T> set(key: Key1<T>, value: T) = set(key.key, value)
 
-    override fun <S, O> set(key: Key2<S, O>, value: O) = set(key.key, key.converter.from(value))
+    override fun <T> set(key: Key<T>, value: T) = set(key.original, value)
 
-    override fun <S, O> set(key: Key3<S, O>, value: O) = set(key.key, key.converter.from(value))
+    override fun <T> set(key: Key1<T>, value: T) {
+        set(key.original, value)
+    }
+
+    override fun <T, O> set(key: Key2<T, O>, value: O) {
+        set(key.original, key.converter.from(value))
+    }
+
+    override fun <T, O> set(key: Key3<T, O>, value: O) {
+        set(key.original, key.converter.from(value))
+    }
 
     override fun <T> minusAssign(key: Key<T>) {
         scope.launch {
             store.edit {
-                it -= key
+                it -= key.original
             }
         }
     }
 
-    override fun <T> contains(key: Key<T>): Boolean =
-        flow.map { preference -> key in preference }.collect()
+    override fun <T> contains(key: Key<T>): Boolean {
+        return flow.map { preference -> key.original in preference }.collect()
+    }
 
-    override fun <T> Flow<T>.toStateFlow(started: SharingStarted): StateFlow<T> =
-        stateIn(scope, started, initialValue = collect())
+    override fun <T> Flow<T>.toStateFlow(started: SharingStarted): StateFlow<T> {
+        return stateIn(scope, started, initialValue = collect())
+    }
 }
-
-

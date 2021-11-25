@@ -5,29 +5,57 @@ import android.content.Context
 import androidx.annotation.WorkerThread
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.datastore.preferences.core.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
-import androidx.datastore.preferences.core.Preferences as Preferences0
+import androidx.datastore.preferences.core.Preferences as DataStorePref
 
-typealias Key<T> = Preferences0.Key<T>
+internal typealias DataStoreKey<T> = DataStorePref.Key<T>
+
+/**
+ * The [Key]
+ */
+open class Key<T> internal constructor(internal val original: DataStoreKey<T>) {
+
+    val name = original.name
+
+    override fun equals(other: Any?): Boolean = original == other
+
+    override fun hashCode(): Int {
+        return original.hashCode()
+    }
+
+    override fun toString(): String = original.toString()
+}
 
 /**
  * [Key] with default value
  */
-data class Key1<T>(val key: Key<T>, val defaultValue: T)
+class Key1<T> internal constructor(original: DataStoreKey<T>, val defaultValue: T) :
+    Key<T>(original)
 
 /**
  * [Key] with [TwoWayConverter]
  */
-data class Key2<S, O>(val key: Key<S>, val converter: TwoWayConverter<O, S>)
+
+class Key2<T, O> internal constructor(
+    original: DataStoreKey<T>,
+    val converter: TwoWayConverter<O, T>
+) : Key<T>(original)
+
 
 /**
  * [Key] with default value and [TwoWayConverter]
  */
-data class Key3<S, O>(val key: Key<S>, val defaultValue: O, val converter: TwoWayConverter<O, S>)
+
+class Key3<T, O> internal constructor(
+    original: DataStoreKey<T>,
+    val defaultValue: O,
+    val converter: TwoWayConverter<O, T>
+) : Key<T>(original)
 
 
 /**
@@ -58,6 +86,7 @@ interface Preferences {
      */
     operator fun <T> get(key: Key<T>): Flow<T?>
 
+
     /**
      * Note: emits [defaultValue] if orginal not exists.
      * @see get
@@ -71,22 +100,22 @@ interface Preferences {
      * Note: Savable are of Type ([String], [Float], [Double], [Int], [Long], String [Set]).
      * This can be nullable if [key] doesn't exist.
      */
-    operator fun <S, O> get(key: Key2<S, O>): Flow<O?>
+    operator fun <T, O> get(key: Key2<T, O>): Flow<O?>
 
     /**
      * **Note returns defaultValue if null**
      *
      * @see get
      */
-    operator fun <S, O> get(key: Key3<S, O>): Flow<O>
+    operator fun <T, O> get(key: Key3<T, O>): Flow<O>
 
     operator fun <T> set(key: Key<T>, value: T)
 
     operator fun <T> set(key: Key1<T>, value: T)
 
-    operator fun <S, O> set(key: Key2<S, O>, value: O)
+    operator fun <T, O> set(key: Key2<T, O>, value: O)
 
-    operator fun <S, O> set(key: Key3<S, O>, value: O)
+    operator fun <T, O> set(key: Key3<T, O>, value: O)
 
     operator fun <T> minusAssign(key: Key<T>)
 
@@ -128,138 +157,128 @@ interface Preferences {
     }
 }
 
-/**
- * Transforms original value to type [Int] and vice versa.
- */
-typealias IntTransformer<O> = TwoWayConverter<O, Int>
-
-fun intPreferenceKey(name: String): Key<Int> =
-    androidx.datastore.preferences.core.intPreferencesKey(name)
-
-fun intPreferenceKey(name: String, defaultValue: Int): Key1<Int> =
-    Key1(intPreferenceKey(name), defaultValue)
-
-
-fun <O> intPreferenceKey(name: String, transformer: IntTransformer<O>) =
-    Key2(intPreferenceKey(name), transformer)
-
-fun <O> intPreferenceKey(
-    name: String,
-    defaultValue: O,
-    transformer: IntTransformer<O>
-) = Key3(
-    intPreferenceKey(name),
-    defaultValue,
-    transformer
-)
 
 
 
 /**
- * Transforms original value to type [Double] and vice versa.
+ * Maps value to/from original.
  */
-typealias DoubleTransformer<O> = TwoWayConverter<O, Double>
+typealias IntMapper<O> = TwoWayConverter<O, Int>
 
-fun doublePreferenceKey(name: String): Key<Double> =
-    androidx.datastore.preferences.core.doublePreferencesKey(name)
+public fun intPreferenceKey(name: String): Key<Int> = Key(intPreferencesKey(name))
 
-fun doublePreferenceKey(name: String, defaultValue: Double): Key1<Double> =
-    Key1(doublePreferenceKey(name), defaultValue)
+public fun intPreferenceKey(name: String, defaultValue: Int): Key1<Int> =
+    Key1(intPreferencesKey(name), defaultValue)
 
-fun <O> doublePreferenceKey(name: String, transformer: DoubleTransformer<O>) =
-    Key2(doublePreferenceKey(name), transformer)
 
-fun <O> doublePreferenceKey(
+public fun <O> intPreferenceKey(name: String, mapper: IntMapper<O>) =
+    Key2(intPreferencesKey(name), mapper)
+
+public fun <O> intPreferenceKey(
     name: String,
     defaultValue: O,
-    transformer: DoubleTransformer<O>
+    mapper: IntMapper<O>
 ) = Key3(
-    doublePreferenceKey(name),
+    intPreferencesKey(name),
     defaultValue,
-    transformer
+    mapper
 )
 
-
-
 /**
- * Transforms original value to type [Float] and vice versa.
+ * Maps value to/from [Double]
  */
-typealias FloatTransformer<O> = TwoWayConverter<O, Float>
+typealias DoubleMapper<O> = TwoWayConverter<O, Double>
 
-fun floatPreferenceKey(name: String): Key<Float> =
-    androidx.datastore.preferences.core.floatPreferencesKey(name)
+public fun doublePreferenceKey(name: String): Key<Double> = Key(doublePreferencesKey(name))
 
-fun floatPreferenceKey(name: String, defaultValue: Float): Key1<Float> =
-    Key1(floatPreferenceKey(name), defaultValue)
+public fun doublePreferenceKey(name: String, defaultValue: Double): Key1<Double> =
+    Key1(doublePreferencesKey(name), defaultValue)
 
-fun <O> floatPreferenceKey(name: String, transformer: FloatTransformer<O>) =
-    Key2(floatPreferenceKey(name), transformer)
+public fun <O> doublePreferenceKey(name: String, mapper: DoubleMapper<O>) =
+    Key2(doublePreferencesKey(name), mapper)
 
-fun <O> floatPreferenceKey(
+public fun <O> doublePreferenceKey(
     name: String,
     defaultValue: O,
-    transformer: FloatTransformer<O>
+    mapper: DoubleMapper<O>
 ) = Key3(
-    floatPreferenceKey(name),
+    doublePreferencesKey(name),
     defaultValue,
-    transformer
+    mapper
 )
 
 
 /**
- * Transforms original value to type [Long] and vice versa.
+ * Maps value to/from [Float].
  */
-typealias LongTransformer<O> = TwoWayConverter<O, Long>
+typealias FloatMapper<O> = TwoWayConverter<O, Float>
 
-fun longPreferenceKey(name: String): Key<Long> =
-    androidx.datastore.preferences.core.longPreferencesKey(name)
+public fun floatPreferenceKey(name: String): Key<Float> = Key(floatPreferencesKey(name))
 
-fun longPreferenceKey(name: String, defaultValue: Long): Key1<Long> =
-    Key1(longPreferenceKey(name), defaultValue)
+public fun floatPreferenceKey(name: String, defaultValue: Float): Key1<Float> =
+    Key1(floatPreferencesKey(name), defaultValue)
 
-fun <O> longPreferenceKey(name: String, transformer: LongTransformer<O>) =
-    Key2(longPreferenceKey(name), transformer)
+public fun <O> floatPreferenceKey(name: String, mapper: FloatMapper<O>) =
+    Key2(floatPreferencesKey(name), mapper)
 
-fun <O> longPreferenceKey(
+public fun <O> floatPreferenceKey(
     name: String,
     defaultValue: O,
-    transformer: LongTransformer<O>
+    mapper: FloatMapper<O>
 ) = Key3(
-    longPreferenceKey(name),
+    floatPreferencesKey(name),
     defaultValue,
-    transformer
+    mapper
 )
-
-
 
 /**
- * Transforms original value to type [String] and vice versa.
+ * Maps value to/from [Long].
  */
-typealias StringTransformer<O> = TwoWayConverter<O, String>
+typealias LongMapper<O> = TwoWayConverter<O, Long>
 
-fun stringPreferenceKey(name: String): Key<String> =
-    androidx.datastore.preferences.core.stringPreferencesKey(name)
+public fun longPreferenceKey(name: String): Key<Long> = Key(longPreferencesKey(name))
 
-fun stringPreferenceKey(name: String, defaultValue: String): Key1<String> =
-    Key1(stringPreferenceKey(name), defaultValue)
+public fun longPreferenceKey(name: String, defaultValue: Long): Key1<Long> =
+    Key1(longPreferencesKey(name), defaultValue)
 
-fun <O> stringPreferenceKey(name: String, transformer: StringTransformer<O>) =
-    Key2(stringPreferenceKey(name), transformer)
+public fun <O> longPreferenceKey(name: String, mapper: LongMapper<O>) =
+    Key2(longPreferencesKey(name), mapper)
 
-fun <O> stringPreferenceKey(
+public fun <O> longPreferenceKey(
     name: String,
     defaultValue: O,
-    transformer: StringTransformer<O>
+    mapper: LongMapper<O>
 ) = Key3(
-    stringPreferenceKey(name),
+    longPreferencesKey(name),
     defaultValue,
-    transformer
+    mapper
 )
 
+/**
+ * Maps value to/from [String].
+ */
+typealias StringMapper<O> = TwoWayConverter<O, String>
+
+public fun stringPreferenceKey(name: String): Key<String> = Key(stringPreferencesKey(name))
+
+public fun stringPreferenceKey(name: String, defaultValue: String): Key1<String> =
+    Key1(stringPreferencesKey(name), defaultValue)
+
+public fun <O> stringPreferenceKey(name: String, mapper: StringMapper<O>) =
+    Key2(stringPreferencesKey(name), mapper)
+
+public fun <O> stringPreferenceKey(
+    name: String,
+    defaultValue: O,
+    mapper: StringMapper<O>
+) = Key3(
+    stringPreferencesKey(name),
+    defaultValue,
+    mapper
+)
 
 ///String set
-fun stringSetPreferenceKey(name: String) =
-    androidx.datastore.preferences.core.stringSetPreferencesKey(name)
+public fun stringSetPreferenceKey(name: String) = Key(stringSetPreferencesKey(name))
 
-fun stringSetPreferenceKey(name: String, defaultValue: Set<String>): Key1<Set<String>> =
-    Key1(stringSetPreferenceKey(name), defaultValue)
+public fun stringSetPreferenceKey(name: String, defaultValue: Set<String>): Key1<Set<String>> =
+    Key1(stringSetPreferencesKey(name), defaultValue)

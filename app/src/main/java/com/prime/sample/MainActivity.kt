@@ -3,11 +3,11 @@ package com.prime.sample
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import com.prime.preferences.LongTransformer
+import com.prime.preferences.LongMapper
 import com.prime.preferences.Preferences
 import com.prime.preferences.longPreferenceKey
 
-val key = longPreferenceKey("Zak", object : LongTransformer<Test> {
+val key = longPreferenceKey("Zak", object : LongMapper<Test> {
     override fun from(value: Test): Long {
         return when (value) {
             Test.fghf -> 0
