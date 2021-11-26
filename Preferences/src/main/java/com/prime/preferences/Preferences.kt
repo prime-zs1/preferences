@@ -133,7 +133,7 @@ interface Preferences {
     fun <T> Flow<T>.toStateFlow(started: SharingStarted): StateFlow<T>
 
     @Composable
-    fun <T> Flow<T>.collectAsState() = collectAsState(collect())
+    fun <T> Flow<T>.observeAsState(): State<T>
 
     companion object {
 
