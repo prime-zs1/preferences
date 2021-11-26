@@ -12,6 +12,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.io.IOException
+import androidx.compose.runtime.collectAsState
 import androidx.datastore.preferences.core.Preferences as Preferences0
 
 private const val TAG = "Preferences"
@@ -92,4 +93,7 @@ internal class PreferencesImpl(context: Context) : Preferences {
     override fun <T> Flow<T>.toStateFlow(started: SharingStarted): StateFlow<T> {
         return stateIn(scope, started, initialValue = collect())
     }
+    
+    @Composable
+    override fun <T> Flow<T>.observeAsState() = collectAsState(collect())
 }
