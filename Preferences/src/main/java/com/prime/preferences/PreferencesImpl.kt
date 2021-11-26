@@ -2,6 +2,7 @@ package com.prime.preferences
 
 import android.content.Context
 import android.util.Log
+import androidx.compose.runtime.Composable
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
