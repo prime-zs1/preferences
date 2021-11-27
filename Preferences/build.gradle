@@ -30,12 +30,19 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
+    buildFeatures {
+        compose true
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion '1.1.0-beta03'
+        kotlinCompilerVersion '1.5.21'
+    }
 }
 
 dependencies {
     //preferences data store.
     implementation 'androidx.datastore:datastore-preferences:1.0.0'
-    implementation "androidx.compose.runtime:runtime:1.1.0-beta03"
+    compileOnly "androidx.compose.runtime:runtime:1.1.0-beta03"
 }
 
 // Because the components are created only during the afterEvaluate phase, you must
